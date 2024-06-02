@@ -1,11 +1,13 @@
-// src/pages/LoginPage.js
 import React, { useState } from "react";
 import { useAuth } from "../components/AuthProvider";
 import AuthForm from "../components/AuthForm";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
     const { login } = useAuth();
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
+
 
     const handleLogin = async (email, password) => {
         try {
@@ -13,6 +15,7 @@ const LoginPage = () => {
         } catch (error) {
             setError(error.message);
         }
+        navigate("/profile")
     };
 
     return (

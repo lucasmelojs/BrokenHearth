@@ -5,7 +5,12 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const auth = useAuthentication();
-    return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
+
+    return (
+        <AuthContext.Provider value={auth}>
+            {auth.loading ? <p>Loading...</p> : children}
+        </AuthContext.Provider>
+    );
 };
 
 export const useAuth = () => useContext(AuthContext);

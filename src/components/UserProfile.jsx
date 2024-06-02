@@ -15,8 +15,6 @@ const UserProfile = ({ userId }) => {
     return (
         <div>
             <h1>{profile.name}</h1>
-            <p>Email: {profile.email}</p>
-            <p>Phone: {profile.phone}</p>
         </div>
     );
 };

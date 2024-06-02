@@ -4,7 +4,9 @@ import { AuthProvider } from "./components/AuthProvider";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import UserProfileWrapper from "./components/UserProfileWrapper";
+import ProfileSetupPage from "./pages/ProfileSetupPage";
 import PrivateRoute from "./components/PrivateRoute";
+import ProfilePage from "./pages/ProfilePage";
 
 const App = () => {
   return (
@@ -18,6 +20,14 @@ const App = () => {
             element={
               <PrivateRoute>
                 <UserProfileWrapper />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile-setup"
+            element={
+              <PrivateRoute>
+                <ProfileSetupPage />
               </PrivateRoute>
             }
           />
