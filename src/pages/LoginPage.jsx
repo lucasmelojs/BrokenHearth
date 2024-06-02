@@ -1,22 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import { useAuth } from "../components/AuthProvider";
 import AuthForm from "../components/AuthForm";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
-    const { login } = useAuth();
-    const [error, setError] = useState(null);
+    const { login, error } = useAuth();
     const navigate = useNavigate();
-
 
     const handleLogin = async (email, password) => {
         try {
             await login(email, password);
-        } catch (error) {
-            setError(error.message);
+            navigate("/profile");
+        } catch (err) {
+            console.error("Login error:", err);
         }
-        navigate("/profile")
     };
+
 
     return (
         <div>

@@ -1,95 +1,37 @@
-import React, { useState } from "react";
-import { useAuth } from "../components/AuthProvider";
-import { ref as dbRef, set as dbSet } from "firebase/database";
-import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useState, useEffect } from "react";
+import { ref, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebaseConfig";
-import { useNavigate } from "react-router-dom";
+import { ref as dbRef, get } from "firebase/database";
 
-const ProfileSetupPage = () => {
-    const { user } = useAuth();
-    const [name, setName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [avatar, setAvatar] = useState(null);
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
+const useFetchProfile = (userId) => {
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const handleAvatarChange = (e) => {
-        if (e.target.files[0]) {
-            setAvatar(e.target.files[0]);
-        }
-    };
+    useEffect(() => {
+        const profileRef = dbRef(db, `users/${userId}`);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError(null);
-
-        if (!user) {
-            setError("User is not logged in");
-            return;
-        }
-        if (!name || !lastName) {
-            setError("Please provide all the information");
-            return;
-        }
-
-        try {
-            let avatarURL = null;
-
-            if (avatar) {
-                const avatarRef = storageRef(storage, `avatars/${user.uid}`);
-                await uploadBytes(avatarRef, avatar);
-                avatarURL = await getDownloadURL(avatarRef);
+        const fetchProfile = async () => {
+            try {
+                const snapshot = await get(profileRef);
+                const data = snapshot.val();
+                if (data) {
+                    // Fetch avatar URL from Firebase Storage if the path exists
+                    const avatarURL = data.avatarPath ? await getDownloadURL(ref(storage, data.avatarPath)) : null;
+                    setProfile({ ...data, avatarURL });
+                } else {
+                    setProfile(null);
+                }
+            } catch (error) {
+                console.error("Error fetching profile:", error);
+            } finally {
+                setLoading(false);
             }
+        };
 
-            const userProfile = {
-                name,
-                lastName,
-                avatar: avatarURL,
-            };
+        fetchProfile();
+    }, [userId]);
 
-            await dbSet(dbRef(db, `users/${user.uid}`), userProfile);
-            console.log("Profile successfully written!");
-            navigate("/ProfilePage");
-        } catch (error) {
-            console.error("Error writing profile: ", error);
-            setError(error.message);
-        }
-    };
-
-    return (
-        <div>
-            <h2>Complete Your Profile</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Name:</label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label>Last Name:</label>
-                    <input
-                        type="text"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label>Profile Picture:</label>
-                    <input
-                        type="file"
-                        onChange={handleAvatarChange}
-                    />
-                </div>
-                {error && <p>{error}</p>}
-                <button type="submit">Let's Go</button>
-            </form>
-        </div>
-    );
+    return { profile, loading };
 };
 
-export default ProfileSetupPage;
+export default useFetchProfile;

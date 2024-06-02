@@ -22,7 +22,7 @@ const useAuthentication = () => {
             setError(null);
             await signInWithEmailAndPassword(auth, email, password);
         } catch (err) {
-            setError(err.message);
+            setError(mapFirebaseError(err.code));
         }
     };
 
@@ -36,6 +36,21 @@ const useAuthentication = () => {
     };
 
     return { user, login, logout, loading, error };
+};
+
+const mapFirebaseError = (errorCode) => {
+    switch (errorCode) {
+        case 'auth/user-not-found':
+            return 'No user found with this email.';
+        case 'auth/wrong-password':
+            return 'Incorrect password.';
+        case 'auth/invalid-email':
+            return 'Invalid email address.';
+        case 'auth/user-disabled':
+            return 'User account is disabled.';
+        default:
+            return `An unexpected error occurred: ${errorCode}`;
+    }
 };
 
 export default useAuthentication;

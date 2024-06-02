@@ -1,5 +1,8 @@
+//UserProfile Component
 import React from "react";
+// import { useParams } from "react-router-dom";
 import useFetchProfile from "../hooks/useFetchProfile";
+import useAuthentication from "../hooks/useAuth";
 
 const UserProfile = ({ userId }) => {
     const { profile, loading } = useFetchProfile(userId);
@@ -12,17 +15,12 @@ const UserProfile = ({ userId }) => {
         return <div>No profile data found</div>;
     }
 
-    // Debugging output
-    console.log("Profile data:", profile);
-
     return (
         <div>
+            <h1>{user.userId}</h1>
             <h1>{profile.name}</h1>
-            {profile.avatarURL ? (
-                <img src={profile.avatarURL} alt="Profile Avatar" onError={(e) => { e.target.onerror = null; e.target.src = "default-avatar-url"; }} />
-            ) : (
-                <div>No avatar available</div>
-            )}
+            <p>{profile.lastName}</p>
+            {profile.avatar && <img src={profile.avatar} alt="Profile Avatar" />}
         </div>
     );
 };

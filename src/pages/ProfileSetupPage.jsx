@@ -49,7 +49,7 @@ const ProfileSetupPage = () => {
 
             await dbSet(dbRef(db, `users/${user.uid}`), userProfile);
             console.log("Profile successfully written!");
-            navigate("/ProfilePage");
+            navigate("/profile");
         } catch (error) {
             console.error("Error writing profile: ", error);
             setError(error.message);
